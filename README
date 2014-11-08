@@ -1,0 +1,25 @@
+unoRover Python Framework v0.01-alpha
+
+To run this version of unoRover simply run:
+
+chmod +x unoRover
+./unoRover
+
+or you can type 
+
+python unoRover
+
+directly.
+
+**Important**
+
+This program MUST be run through python v2.7, earlier versions 
+do not support ternary operations and as such you will receive a syntax 
+error. It is also not compatible with python v3.x.
+
+Dependencies:
+
+	colorama
+	pyserial
+	pyreadline
+	
