@@ -25,6 +25,10 @@ Python Dependencies:
 	colorama   - https://pypi.python.org/pypi/colorama
 	pyserial   - https://pypi.python.org/pypi/pyserial
 	pyreadline - https://pypi.python.org/pypi/pyreadline
+
+
+Extract the Arduino folder to C:\yourusername\My Documents\Arduino(or wherever your sketch directory is) it will add
+the required libraries as well as the rover sketch. At the moment it is set to work with a Serial connection over USB using w, a, s, and d to control it. Support for XBee wireless communication will soon be added.
 	
 
 Special Thanks:
