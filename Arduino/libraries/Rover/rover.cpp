@@ -1,7 +1,7 @@
 #include <rover.h>
 #include <Arduino.h>
 
-Rover::Rover(int id, int rspeed) : motor1(1, MOTOR12_64KHZ), motor2(1, MOTOR12_64KHZ)
+Rover::Rover(int id, int rspeed) : motor1(1, MOTOR12_64KHZ), motor2(2, MOTOR12_64KHZ)
 {  
     int rid = id;
 	roverSpeed(rspeed); 
@@ -38,7 +38,7 @@ void Rover::turn(int dir, int ang)
 		  motor2.run(FORWARD); 
 	   }
 	   counter++;
-	   delay(10);
+	   //delay(10);
    }
 }
 

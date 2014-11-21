@@ -15,7 +15,7 @@ void loop()
 {
 
   instruction = (Serial.available() > 0) ? Serial.read() : instruction;
-  Serial.println((char)instruction);
+  //Serial.println((char)instruction);
   switch(instruction)
   {
      case 'w':
