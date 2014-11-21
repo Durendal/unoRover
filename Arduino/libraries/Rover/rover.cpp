@@ -4,6 +4,7 @@
 Rover::Rover(int id, int rspeed, int inst) : motor1(1, MOTOR12_64KHZ), motor2(2, MOTOR12_64KHZ)
 {  
 	int instruction = inst;
+	int lastInstruction;
     int rid = id;
 	roverSpeed(rspeed); 
 	stopRover();
@@ -61,10 +62,21 @@ int Rover::roverSpeed(int newSpeed)
 
 void Rover::setInstruction(int inst)
 {
+	lastInstruction = instruction;
 	instruction = inst;
 }
 
 int Rover::getInstruction()
 {
 	return instruction;
+}
+
+void Rover::setLastInstruction(int inst)
+{
+	lastInstruction = inst;
+}
+
+void Rover::getLastInstruction()
+{
+	return lastInstruction;
 }

@@ -7,6 +7,7 @@ class Rover
 	public:
 		XBee xbee;
 		int instruction;
+		int lastInstruction;
 		Rover(int id, int rspeed, int inst);
 		void moveForward();
 		void moveBackward();
@@ -14,13 +15,14 @@ class Rover
 		void stopRover();
 		int roverSpeed(int);
 		void setInstruction(int);
-		void getInstruction();
+		int getInstruction();
+		void setLastInstruction(int);
+		int getLastInstruction();
+		
 	private:
 		AF_DCMotor motor1;
 		AF_DCMotor motor2;
 		int rid;
-
-	
 };
 
 #endif
