@@ -27,7 +27,7 @@ class Getch:
         return ch
 
     def getdatch(self):
-        if self.os == 'poxis':
+        if self.os == 'posix':
             return self.GetchUnix()
         else:
             return self.GetchWindows()
