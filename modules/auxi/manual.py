@@ -28,7 +28,11 @@ class manual:
 		
 
 	def execute(self):
-		con = Serial(port=self.serial, baudrate=9600)
+		try:
+			con = Serial(port=self.serial, baudrate=9600)
+		except:
+			print "Failed to connect to %s be sure it exists and isnt in use." % self.serial
+			return False
 		print "Prepare yourself foolish mortal:"
 		pew = "\x00" #Write 0 into pew so it will pass the initial while condition
 		while True:
