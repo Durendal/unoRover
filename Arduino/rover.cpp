@@ -7,7 +7,9 @@ Rover::Rover(int id, int speed)
 	id = id;
 	AF_DCMotor motor1(1, MOTOR12_64KHZ); // create motor #2, 64KHz pwm
 	AF_DCMotor motor2(2, MOTOR12_64KHZ); // create motor #2, 64KHz pwm
-	roverSpeed(speed);
+	
+	//If the value entered for speed is out of the acceptable range we set it to 200
+	roverSpeed((speed < 0 || speed > 255) ? 200 : speed); 
 }
 
 void Rover::moveForward()
