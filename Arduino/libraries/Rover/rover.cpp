@@ -1,8 +1,9 @@
 #include <rover.h>
 #include <Arduino.h>
 
-Rover::Rover(int id, int rspeed) : motor1(1, MOTOR12_64KHZ), motor2(2, MOTOR12_64KHZ)
+Rover::Rover(int id, int rspeed, int inst) : motor1(1, MOTOR12_64KHZ), motor2(2, MOTOR12_64KHZ)
 {  
+	int instruction = inst;
     int rid = id;
 	roverSpeed(rspeed); 
 	stopRover();
@@ -56,4 +57,14 @@ int Rover::roverSpeed(int newSpeed)
    motor1.setSpeed(newSpeed);
    motor2.setSpeed(newSpeed);
    return 1;
+}
+
+void Rover::setInstruction(int inst)
+{
+	instruction = inst;
+}
+
+int Rover::getInstruction()
+{
+	return instruction;
 }

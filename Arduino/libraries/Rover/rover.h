@@ -6,15 +6,15 @@ class Rover
 {
 	public:
 		XBee xbee;
-		
-	
-		//Rover(int id, int rspeed = 200);
-		Rover(int id, int rspeed);
+		int instruction;
+		Rover(int id, int rspeed, int inst);
 		void moveForward();
 		void moveBackward();
 		void turn(int, int);
 		void stopRover();
 		int roverSpeed(int);
+		void setInstruction(int);
+		void getInstruction();
 	private:
 		AF_DCMotor motor1;
 		AF_DCMotor motor2;
