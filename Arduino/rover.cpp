@@ -1,4 +1,14 @@
 #include "Rover.h"
+#include "Arduino.h"
+#include <AFMotor.h>
+
+Rover::Rover(int id, int speed)
+{
+	id = id;
+	AF_DCMotor motor1(1, MOTOR12_64KHZ); // create motor #2, 64KHz pwm
+	AF_DCMotor motor2(2, MOTOR12_64KHZ); // create motor #2, 64KHz pwm
+	roverSpeed(speed);
+}
 
 void Rover::moveForward()
 {
