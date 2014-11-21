@@ -6,9 +6,7 @@ class Rover
 {
 	public:
 		XBee xbee;
-		AF_DCMotor motor1;
-		AF_DCMotor motor2;
-		int rid;
+		
 	
 		//Rover(int id, int rspeed = 200);
 		Rover(int id, int rspeed);
@@ -17,6 +15,10 @@ class Rover
 		void turn(int, int);
 		void stopRover();
 		int roverSpeed(int);
+	private:
+		AF_DCMotor motor1;
+		AF_DCMotor motor2;
+		int rid;
 
 	
 };
