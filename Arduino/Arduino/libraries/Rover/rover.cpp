@@ -1,15 +1,11 @@
-#include "Rover.h"
-#include "Arduino.h"
-#include <AFMotor.h>
+#include <rover.h>
+#include <Arduino.h>
 
-Rover::Rover(int id, int speed)
-{
-	id = id;
-	AF_DCMotor motor1(1, MOTOR12_64KHZ); // create motor #2, 64KHz pwm
-	AF_DCMotor motor2(2, MOTOR12_64KHZ); // create motor #2, 64KHz pwm
-	
-	//If the value entered for speed is out of the acceptable range we set it to 200
-	roverSpeed((speed < 0 || speed > 255) ? 200 : speed); 
+Rover::Rover(int id, int rspeed) : motor1(1, MOTOR12_64KHZ), motor2(1, MOTOR12_64KHZ)
+{  
+    int rid = id;
+	roverSpeed(rspeed); 
+	stopRover();
 }
 
 void Rover::moveForward()
@@ -54,8 +50,9 @@ void Rover::stopRover()
 
 int Rover::roverSpeed(int newSpeed)
 {
-   if(newSpeed < 0 || newSpeed > 255)
-	  return 0;
+
+   //If the value entered for speed is out of the acceptable range we set it to 200
+   newSpeed = (newSpeed < 0 || newSpeed > 255) ? 200 : newSpeed;
    motor1.setSpeed(newSpeed);
    motor2.setSpeed(newSpeed);
    return 1;
