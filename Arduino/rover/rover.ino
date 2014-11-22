@@ -10,7 +10,7 @@ void setup()
  
 void loop() 
 {
-  rover1.getInstruction((Serial.available() > 0) ? Serial.read() : instruction);
+  rover1.setInstruction((Serial.available() > 0) ? Serial.read() : instruction);
   
   switch(rover1.instruction)
   {
