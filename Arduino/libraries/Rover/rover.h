@@ -8,7 +8,7 @@ class Rover
 		XBee xbee;
 		int instruction;
 		int lastInstruction;
-		Rover(int id, int rspeed, int inst);
+		Rover(int id, int rspeed);
 		void moveForward();
 		void moveBackward();
 		void turn(int, int);

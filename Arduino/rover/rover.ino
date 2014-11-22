@@ -3,14 +3,27 @@
 #include <rover.h>
 
 Rover rover1(0, 200);
+unsigned int count = 0;
 
 void setup() 
 {
+    Serial.begin(9600);
+    Serial.println("Initializing Rover..");
 }
  
 void loop() 
 {
-  rover1.setInstruction((Serial.available() > 0) ? Serial.read() : instruction);
+  //On every ten millionth iteration send the instruction over serial
+  //*FOR DEBUGGING PURPOSES REMOVE IN FINAL BUILD*
+  if(count % 10000000)
+    Serial.println(rover1.instruction);
+    
+  //Just so the number doesnt get too high. Stoned numbers are shifty and not to be trusted.
+  if(count > 10000000)
+    count = 0;
+  count++;
+  
+  rover1.setInstruction((Serial.available() > 0) ? Serial.read() : rover1.instruction);
   
   switch(rover1.instruction)
   {

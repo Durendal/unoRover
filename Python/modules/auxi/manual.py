@@ -24,10 +24,12 @@ class manual:
 		self.fw = framework
 		self.variables = {}
 		self.variables['serial'] = {'required' : True, 'description' : 'address of serial port'}
+		self.variables['verbose'] = {'required' : False, 'description' : 'prints out every ten millionth instruction as sent back from the rover', 'default' : False}
 		
 		
 
 	def execute(self):
+
 		try:
 			con = Serial(port=self.serial, baudrate=9600)
 		except:
@@ -36,11 +38,27 @@ class manual:
 		print "Prepare yourself foolish mortal:"
 		pew = "\x00" #Write 0 into pew so it will pass the initial while condition
 		while True:
+			# If verbose is set, we need to print out the message every ten millionth iteration
+			if self.verbose:
+				recv =  con.inWaiting()
+				msg = ""
+				while recv:
+					chunk = con.read(recv)
+					msg += chunk
+					recv -= len(chunk)
+				
+				if len(msg) > 1:
+					print msg
+
 			# Break the loop if the user presses esc
 			if pew == "\x1b":
 				break
 			pew = self.fw.libs.Getch.getdatch()
-			con.write(pew)
+			try:
+				con.write(pew)
+			except:
+				print "Error writing to serial. Terminating."
+				return False
 			print pew
 		print "Other Barry says: later tater"
 		return True

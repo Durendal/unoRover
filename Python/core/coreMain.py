@@ -62,6 +62,7 @@ class coreMain:
 		print self.fw.cstring("\tset <variable> <value>", "green")  +  self.fw.cstring(" - " , "red", None, "bright")  +  self.fw.cstring("Set a variable to value (ex. set mode autonomous)" , "white", None, "dark")
 		print self.fw.cstring("\tshow variables/view", "green")  +  self.fw.cstring(" - " , "red", None, "bright")  +  self.fw.cstring("Show the modules configuration variables" , "white", None, "dark")
 		print self.fw.cstring("\trun", "green")  +  self.fw.cstring(" - " , "red", None, "bright")  +  self.fw.cstring("Run the currently loaded module" , "white", None, "dark")
+		print self.fw.cstring("\trefresh", "green")  +  self.fw.cstring(" - " , "red", None, "bright")  +  self.fw.cstring("Reload all modules and libraries." , "white", None, "dark")
 		return True
 	
 	# Print a formatted Box like [*]
