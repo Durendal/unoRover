@@ -368,7 +368,7 @@ class Framework:
 		return True
 
 	def update(self):
-		self.core.coreModules.preloadModules()
+		self.core.coreModules.reloadModules()
 		self.libs.preloadLibs()
 
 		return True

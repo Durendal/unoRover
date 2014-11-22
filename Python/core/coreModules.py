@@ -47,6 +47,29 @@ class coreModules:
 
         return True
 
+    # Re-Load modules into global namespace
+    def reloadModules(self):
+        sys.path.append("modules"+self.fw.seperator)
+
+        for mod in self.fw.modTypes:
+            # Add module directory
+            sys.path.append("modules"+self.fw.seperator+mod+""+self.fw.seperator)
+
+            # Create a list of available modules
+            module = glob.glob("modules"+self.fw.seperator + mod + self.fw.seperator+"*.py")
+
+            # Place each module in the global namespace
+            for i in range(len(module)):
+            
+                module[i] = module[i].split(".")[0].split(""+self.fw.seperator)[2]
+                module[i] = mod+"."+module[i]
+                #try:
+                reload(module[i])
+                #except:
+                #    print "Error Loading " + mod
+
+        return True
+
     # Verify Module is set
     def verifyModule(self):
 

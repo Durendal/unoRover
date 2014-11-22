@@ -23,13 +23,17 @@ class manual:
 		self.description = "Manually controlled diagnostic algorithm"
 		self.fw = framework
 		self.variables = {}
+		self.variables['verbose'] = {'required' : False, 'description' : 'prints out every ten millionth instruction as sent back from the rover', 'default' : 'False'}
 		self.variables['serial'] = {'required' : True, 'description' : 'address of serial port'}
-		self.variables['verbose'] = {'required' : False, 'description' : 'prints out every ten millionth instruction as sent back from the rover', 'default' : False}
+		
 		
 		
 
 	def execute(self):
-
+		if self.verbose.lower() == "true":
+			verbose = True
+		else:
+			verbose = False
 		try:
 			con = Serial(port=self.serial, baudrate=9600)
 		except:
@@ -39,7 +43,7 @@ class manual:
 		pew = "\x00" #Write 0 into pew so it will pass the initial while condition
 		while True:
 			# If verbose is set, we need to print out the message every ten millionth iteration
-			if self.verbose:
+			if verbose:
 				recv =  con.inWaiting()
 				msg = ""
 				while recv:
