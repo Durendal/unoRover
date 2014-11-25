@@ -1,28 +1,48 @@
 #ifndef COORDINATOR_H
 #define COORDINATOR_H
-#include <XBee.h>
-#include <String.h>
+
 #include <Arduino.h>
-#include <queue.h>
-#include <SoftwareSerial.h>
 #include <Wire.h>
 
-class Coordinator()
+/*
+	Constants:
+		MAX_MSG - maximum size of message buffer
+		COORDINATOR - Device ID for use in I2C communications
+		ROVER - Device ID for use in I2C communications
+		SENSOR - Device ID for use in I2C communications
+		ENCODER - Sensor ID for encoders
+		ULTRASONIC - Sensor ID for ultrasonic sensors
+		CAMERA - Sensor ID for cameras
+*/
+#define MAX_MSG 1024
+#define COORDINATOR 0
+#define ROVER 1
+#define SENSOR 2
+#define ENCODER 0
+#define ULTRASONIC 1
+#define CAMERA 2
+
+class Coordinator
 {
 	public:
-		XBee xbee;
-		
-		SoftwareSerial sserial(0,1);
 
-		int getSensorReading(int sensorType, int sensorNum);
-		void setInstruction(char* instruction);
+		Coordinator(int id);
+		char* Reading();
+		void sendInstruction(int deviceID);
+		int receiveInstruction();
+		void sendData(String data);
+		void setInstruction(char* instr, int len = MAX_MSG);
 		char* getInstruction();
-		void setRxXBeeAddress(int addr);
-		void setTxXBeeAddress(int addr);
+		void setRoverID(int id);
+		int getRoverID();
+		int parseInstruction();
 	private:
-		char* instruction;
-		XBeeAddress64 hal9000;
-		XBeeAddress64 davidBowman;
+		void clearInstruction();
+		char instruction[MAX_MSG];
+		char lastInstruction[MAX_MSG];
+		int roverID;
+		int senID;
+		int senNum;
 
 };
 

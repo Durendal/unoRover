@@ -1,4 +1,3 @@
-#include <Wire.h>
 #include <sensor.h>
 
 Sensor sensor;
@@ -6,7 +5,7 @@ char instruction[1024];
 
 void setup()
 {
-	 Wire.begin(2);
+	 Wire.begin(SENSOR);
 	 Wire.onRequest(requestEvent);
 	 Wire.onReceive(receiveEvent);
 	 int encoder1[] = {10};

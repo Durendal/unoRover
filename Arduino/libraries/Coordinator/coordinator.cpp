@@ -1,25 +1,28 @@
 #include <coordinator.h>
 #include <Arduino.h>
 
-Coordinator::Coordinator()
+Coordinator::Coordinator(int id)
 {
-	XBee xbee = XBee();
-	XBeeAddress64 hal9000 = XBeeAddress64(0x0013a200, 0x40bf058f);//Controller XBee address
-	XBeeAddress64 davidBowman = XBeeAddress64(0x0013a200, 0x40c41907);//Coordinator XBee address
-	uint8_t payload[MAX_FRAME_DATA_SIZE];
-	ZBRxResponse Rx = ZBRxResponse();
-	SoftwareSerial sserial(0,1);
-	char* instruction;
+	char instruction[MAX_MSG];
+	char lastInstruction[MAX_MSG];
 	Wire.begin();
+	Serial.begin(9600);
+	int roverID = id;
+	int senID;
+	int senNum;
 }
 
-int Coordinator::Reading(int ownerNum, int deviceType, int deviceNum)
+char* Coordinator::Reading()
 {
-	char reading[1024];
-	Wire.beginTransmission(ownerNum);
-	Wire.write("COMMAND: READ " + ownerNum + ":" + deviceType + ":" + deviceNum);
-	Wire.endTransmission();
-	Wire.requestFrom(5, 1024);
+
+	//Create a buffer for the result, and construct a query for the SENSOR device
+	char reading[MAX_MSG]; 
+	sendInstruction(SENSOR);
+
+	//Ping the SENSOR device for its results
+	Wire.requestFrom(SENSOR, MAX_MSG);
+	
+	//Read in results from SENSOR device
 	int i = 0;
 	while(Wire.available())
 	{
@@ -28,40 +31,99 @@ int Coordinator::Reading(int ownerNum, int deviceType, int deviceNum)
 	}
 	reading[i] = '\0';
 
+	
 	return strdup(reading);
 }
 
-void Coordinator::setInstruction(char* instruction, int deviceNum)
+void Coordinator::sendInstruction(int deviceID)
 {
-	Wire.beginTransmission(deviceNum);
+	Wire.beginTransmission(deviceID);
 	Wire.write(strdup(instruction));
 	Wire.endTransmission();
 }
 
+int Coordinator::receiveInstruction()
+{
+	int i = 0;
+
+	//Check if theres any data on the serial line
+	if(Serial.available())
+	{
+
+		//Copy the current instruction into lastInstruction, then zero out instruction
+		strncpy(lastInstruction, instruction, sizeof(instruction));
+		clearInstruction();
+
+		//Read the data into instruction
+		while(Serial.available())
+		{
+			instruction[i] = Serial.read();
+			i++;
+		}
+		instruction[i] = '\0';
+
+		return true;
+	}
+
+	return false;
+}
+
+void sendData(String data)
+{
+	Serial.print(data);
+}
+
+void Coordinator::setInstruction(char* instr, int len)
+{
+	strncpy(instruction, instr, len);
+}
+
 char* Coordinator::getInstruction()
 {
-	xbee.readPacket(100);
-
-	char* instruction;
-	if(xbee.getResponse().isAvailable())
-	{
-		if(xbee.getResponse().getApiId() == ZB_RX_RESPONSE)
-		{
-			xbee.getResponse().getZBRxResponse(Rx);
-		}
-	}
-	else
-		return false;
-	
 	return strdup(instruction);
 }
 
-void setRxXBeeAddress(int addr)
+void Coordinator::setRoverID(int id)
 {
-	davidBowman = XBeeAddress64(0x0013a200, addr);
+	roverID = id;
 }
 
-void setTxXBeeAddress(int addr)
+int Coordinator::getRoverID()
 {
-	hal9000 = XBeeAddress64(0x0013a200, addr);
+	return roverID;
+}
+
+void Coordinator::clearInstruction()
+{
+	//Zero out instruction
+	int i;
+	for(i = 0; i < MAX_MSG; i++)
+		instruction[i] = 0;
+}
+
+int Coordinator::parseInstruction()
+{
+	// Read in the first 4 characters after Command: 
+	
+	char temp[4];
+	int i;
+	for(i = 9; i < 13; i++)
+		temp[i-9] = instruction[i];
+	
+	temp[i] = '\0';
+	
+	// If temp contains READ this is a sensor instruction
+	if(strcmp(temp, "READ") == 0)
+	{
+		return SENSOR;
+	}
+	// If temp contains WRIT this is a rover instruction
+	else if(strcmp(temp, "WRIT") == 0)
+	{
+		return ROVER;
+	}
+	else
+	{
+		return 0;
+	}
 }

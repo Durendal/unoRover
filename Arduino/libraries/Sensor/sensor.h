@@ -2,8 +2,11 @@
 #define SONSOR_H
 #include <Wire.h>
 #include <Arduino.h>
+#include <coordinator.h>
+
 #define MAX_SENSORS 10
 #define MAX_PINS 20
+
 class Sensor
 {
 	public:

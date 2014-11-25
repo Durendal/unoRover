@@ -1,13 +1,15 @@
 #include <rover.h>
-#include <Arduino.h>
 
-Rover::Rover(int id, int rspeed) : motor1(1, MOTOR12_64KHZ), motor2(2, MOTOR12_64KHZ)
+Rover::Rover(int rspeed) : motor1(1, MOTOR12_64KHZ), motor2(2, MOTOR12_64KHZ)
 {  
-	int instruction;
-	int lastInstruction;
-    int rid = id;
+	int command = 'h';
+	char instruction[MAX_MSG];
+	char lastInstruction[MAX_MSG];
+	int turnAngle;
 	roverSpeed(rspeed); 
 	stopRover();
+	Wire.begin(ROVER);
+	 
 }
 
 void Rover::moveForward()
@@ -22,10 +24,10 @@ void Rover::moveBackward()
    motor2.run(FORWARD); 
 }
 
-void Rover::turn(int dir, int ang)
+void Rover::turn(int dir)
 {
    int counter = 0;
-   while(counter < ang)
+   while(counter < turnAngle)
    {
 	   //left turn
 	   if(dir == 0)
@@ -40,10 +42,10 @@ void Rover::turn(int dir, int ang)
 		  motor2.run(FORWARD); 
 	   }
 	   counter++;
-	   //delay(10);
    }
 }
 
+// HONK HONK!!
 void Rover::stopRover()
 {
    motor1.run(RELEASE);
@@ -60,23 +62,43 @@ int Rover::roverSpeed(int newSpeed)
    return 1;
 }
 
-void Rover::setInstruction(int inst)
+void Rover::setInstruction(char inst[])
 {
-	lastInstruction = instruction;
-	instruction = inst;
+	setLastInstruction();
+	strncpy(instruction, inst, MAX_MSG);
 }
 
-int Rover::getInstruction()
+char* Rover::getInstruction()
 {
 	return instruction;
 }
 
-void Rover::setLastInstruction(int inst)
+void Rover::setLastInstruction()
 {
-	lastInstruction = inst;
+	strncpy(lastInstruction, instruction, MAX_MSG);
 }
 
-int Rover::getLastInstruction()
+char* Rover::getLastInstruction()
 {
 	return lastInstruction;
+}
+
+void Rover::setAngle(int angle)
+{
+	turnAngle = angle;
+}
+
+int Rover::getAngle()
+{
+	return turnAngle;
+}
+
+void Rover::setCommand(int com)
+{
+	command = com;
+}
+
+int Rover::getCommand()
+{
+	return command;
 }
