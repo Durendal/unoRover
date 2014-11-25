@@ -26,67 +26,37 @@ void loop()
 void requestEvent()
 {
 	int command = 0;
-	char* flags[] = {"COMMAND",
-			 "READ",
-			 "NUMSEN",
-			 "TYPESEN"};
+	char* flags[] = {
+				"READ",
+			 	"NUMS",
+			 	"TYPE"
+			};
 									
 	int type, sensorNum;
 	int i, j, k = 0;
-	for(i = 0; i < 7; i++)
-		if(instruction[i] != flags[0][i])
-		{
-			command = 1;
-			break;
-		}
-	if(command == 0)
+	char tmp[4];
+	for(i = 0; i < 4; i++)
+		tmp[i] = instruction[9+i];
+
+	if(strncmp("COMMAND: ", instruction, 9))
 	{
-		i += 2;
-		for(j = 0; j < 4; j++)
-			if(instruction[i+j] != flags[1][j])
-			{
-				command = 1;
-				break;
-			}
-		if(command == 0)
+		if(strncmp(tmp, flags[0], 4))
 		{
-			i = i + j;
-			i += 2;
-			type = instruction[i];
-			i += 2;
-			sensorNum = instruction[i]; 
+			type = instruction[15];
+			sensorNum = instruction[17];
+
 			if(type == 0)
 				Wire.write(sensor.readSensor(sensorNum));
 			else if(type == 1)
 				Wire.write(sensor.readSensor((float)sensorNum));
 		}
-	}
-	if(command == 1)
-	{
-		for(int j = 0; j < 6; j++)
-			if(instruction[i + j] != flags[2][j])
-			{
-				command = 2;
-				break; 
-			}
-		if(command == 1)
+		else if(strncmp(tmp, flags[1], 4))
 		{
 			Wire.write(sensor.numSensors());
 		}
-	}
-	if(command == 2)
-	{
-		for(int j = 0; j < 7; j++)
-			if(instructions[i + j] != flags[3][j])
-			{
-				command = 3;
-				break;
-			} 
-	
-		if(command == 2)
+		else if(strncmp(tmp, flags[2], 4))
 		{
-			i += 2;
-			int sensorNum = (instruction[i] == '1' && instruction[i+1] == '0') ? 10 : instruction[i];
+			int sensorNum = (instruction[15] == '1' && instruction[16] == '0') ? 10 : atoi(instruction[15]);
 			Wire.write(sensor.sensorType(sensorNum)); 
 		}
 	}
@@ -97,8 +67,8 @@ void receiveEvent(int num)
 	int i = 0;
 	while(Wire.available())
 	{
-			instruction[i] = Wire.read();
-			i++;
+		instruction[i] = Wire.read();
+		i++;
 	}
 	instruction[i] = '\0';
 	

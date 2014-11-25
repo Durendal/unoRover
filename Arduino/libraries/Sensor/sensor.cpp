@@ -86,5 +86,5 @@ int Sensor::numSensors()
 */
 int Sensor::sensorType(int sensorNum)
 {
-	return sensors[sensorCount];
+	return sensors[sensorNum];
 }
