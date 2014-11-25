@@ -27,7 +27,7 @@ class Coordinator
 	public:
 
 		Coordinator(int id);
-		char* Reading();
+		int Reading();
 		void sendInstruction(int deviceID);
 		int receiveInstruction();
 		void sendData(String data);
@@ -36,13 +36,14 @@ class Coordinator
 		void setRoverID(int id);
 		int getRoverID();
 		int parseInstruction();
+		int senID;
+		int senNum;
 	private:
 		void clearInstruction();
 		char instruction[MAX_MSG];
 		char lastInstruction[MAX_MSG];
 		int roverID;
-		int senID;
-		int senNum;
+
 
 };
 

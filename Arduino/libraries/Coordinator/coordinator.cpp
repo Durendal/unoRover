@@ -12,7 +12,7 @@ Coordinator::Coordinator(int id)
 	int senNum;
 }
 
-char* Coordinator::Reading()
+int Coordinator::Reading()
 {
 
 	//Create a buffer for the result, and construct a query for the SENSOR device
@@ -32,7 +32,7 @@ char* Coordinator::Reading()
 	reading[i] = '\0';
 
 	
-	return strdup(reading);
+	return atoi(reading);
 }
 
 void Coordinator::sendInstruction(int deviceID)
@@ -68,7 +68,7 @@ int Coordinator::receiveInstruction()
 	return false;
 }
 
-void sendData(String data)
+void Coordinator::sendData(String data)
 {
 	Serial.print(data);
 }
