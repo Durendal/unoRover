@@ -3,92 +3,79 @@
 #include <coordinator.h>
 #include <Wire.h>
 
-
 Rover rover1(200);
-
+String instruction;
+char command;
 void setup() 
 {
-	Serial.begin(9600);
+        Serial.begin(9600);
 	Wire.begin(ROVER);
+        Wire.onReceive(receiveEvent);
+        rover1.stopRover();
+        command = 'h';
+        instruction = "";
 }
- 
+
 void loop() 
 {
-	delay(0.01);
-}
+    drive();
+    delay(100);
+    
+}  
+
 void drive()
 {
-        
-	switch(rover1.getCommand())
+
+	switch(command)
 	{
 		case 'w':
+                case 'W':
+                
 			rover1.moveForward();
 			break;
+                case 'A':
 		case 'a':
 			rover1.turn(0);
 			break;
+                case 'S':
 		case 's':
 			rover1.moveBackward();
 			break;
+                case 'D':
 		case 'd':
 			rover1.turn(1);
 			break;
+                case 'H':
 		case 'h':
 		default:
 			rover1.stopRover();
 			break; 				
-        }
-}
-
-void parseInstruction()
-{
-	char tmp[3];
-	tmp[0] = rover1.instruction[19];
-	tmp[1] = rover1.instruction[20];
-	tmp[2] = rover1.instruction[21];
-        char* flags[] = {"BAC",
-                   "FWD",
-                   "STP",
-                   "LFT",
-                   "RGT"};
-	//Check for Move [FWD | BAC | STP] commands	
-	if(strncmp(rover1.instruction, "COMMAND: WRIT MOVE ", 19) == 0)
-	{
-                if(strncmp(tmp, flags[0], 3))
-                    rover1.setCommand('s');
-                else if(strncmp(tmp, flags[1], 3))
-                    rover1.setCommand('w');
-                else
-                    rover1.setCommand('h');
-		drive();
-	}
-	else if(strncmp(rover1.instruction, "COMMAND: WRIT TURN ", 19) == 0)
-	{
-		char ang[3];
-		ang[0] = rover1.instruction[23];
-		ang[1] = rover1.instruction[24];
-		ang[2] = (rover1.instruction[23] == ' ') ? '\0' : rover1.instruction[23];		
-		rover1.setAngle(atoi(ang));
-                if(strncmp(tmp, flags[3], 3))
-                    rover1.setCommand('a');
-                else if(strncmp(tmp, flags[4], 3))
-                    rover1.setCommand('d');
-                else
-                    rover1.setCommand('h');
-		drive();
-	} 
+        }        
+        delay(3000);
 }
 
 void receiveEvent(int num)
 {
-	int i = 0;
-	char inst[MAX_MSG];
-	while(Wire.available())
-	{
-		inst[i] = Wire.read();
-		i++;
-	}
-	inst[i] = '\0';
-	rover1.setInstruction(inst);
-	parseInstruction();
+    char c;
+    while(Wire.available())
+    {
+        c = Wire.read();
+        instruction += c;
+    }
+    parseInstruction();
 }
+
+void parseInstruction()
+{
+   if(instruction.indexOf("FWD") != -1)
+      command = 'w';
+   else if(instruction.indexOf("BAC") != -1)
+      command = 's';
+   else if(instruction.indexOf("LFT") != -1)
+      command = 'a';
+   else if(instruction.indexOf("RGT") != -1)
+      command = 'd';
+   else
+      command = 'h'; 
+}
+
