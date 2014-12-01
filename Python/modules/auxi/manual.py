@@ -50,6 +50,7 @@ class manual:
 					chunk = con.read(recv)
 					msg += chunk
 					recv -= len(chunk)
+					time.sleep(0.1)
 				
 				if len(msg) > 1:
 					print msg
@@ -59,7 +60,24 @@ class manual:
 				break
 			pew = self.fw.libs.Getch.getdatch()
 			try:
-				con.write(pew)
+				command = "COMMAND: WRIT "
+				if pew.lower() == 'w':
+					command += "MOVE FWD"
+				elif pew.lower() == 's':
+					command += "MOVE BAC"
+				elif pew.lower() == 'a':
+					command += "TURN LFT"
+				elif pew.lower() == 'd':
+					command += "TURN RGT"
+				elif pew.lower() == 'p':
+					spd = ""
+					for i in range(0, 4):
+						spd += self.fw.libs.Getch.getdatch()
+					command += "MOVE SPD " + spd
+				else:
+					command += "MOVE STP"
+
+				con.write(command)
 			except:
 				print "Error writing to serial. Terminating."
 				return False
