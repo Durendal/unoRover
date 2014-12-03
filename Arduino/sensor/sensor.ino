@@ -1,75 +1,68 @@
 #include <sensor.h>
+#include <coordinator.h>
+#include <Wire.h>
+#include <types.h>
 
-Sensor sensor;
-char instruction[1024];
+
+String instruction;
+int echoPin = 8;
+int trigPin = 9;
+int reading = 0;
 
 void setup()
 {
+        Serial.begin(9600);
+	//Initialise I2C connection
 	 Wire.begin(SENSOR);
 	 Wire.onRequest(requestEvent);
 	 Wire.onReceive(receiveEvent);
-	 int encoder1[] = {10};
-	 int encoder2[] = {8};
-	 int ultra1[] = {3, 11};
-	 int ultra2[] = {9, 6};
-	 sensor.addSensor(0, encoder1);
-	 sensor.addSensor(0, encoder2);
-	 sensor.addSensor(1, ultra1);
-	 sensor.addSensor(1, ultra2);
+         pinMode(echoPin, INPUT);
+         pinMode(trigPin, OUTPUT);
+         getReading();
 }
 
+// wheeeee round and round and round we go
 void loop()
 {
+         getReading();
 	 delay(10); 
 }
 
+//Callback for I2C request
 void requestEvent()
 {
-	int command = 0;
-	char* flags[] = {
-				"READ",
-			 	"NUMS",
-			 	"TYPE"
-			};
-									
-	int type, sensorNum;
-	int i, j, k = 0;
-	char tmp[4];
-	for(i = 0; i < 4; i++)
-		tmp[i] = instruction[9+i];
 
-	if(strncmp("COMMAND: ", instruction, 9))
+        Wire.write(reading);
+      
+}
+
+//Callback for I2C receive
+void receiveEvent(int num)
+{
+        instruction = "";
+	//Read in the new instruction from Wire
+        int c;
+	while(Wire.available())
 	{
-		if(strncmp(tmp, flags[0], 4))
-		{
-			type = instruction[15];
-			sensorNum = instruction[17];
-
-			if(type == 0)
-				Wire.write(sensor.readSensor(sensorNum));
-			else if(type == 1)
-				Wire.write(sensor.readSensor((float)sensorNum));
-		}
-		else if(strncmp(tmp, flags[1], 4))
-		{
-			Wire.write(sensor.numSensors());
-		}
-		else if(strncmp(tmp, flags[2], 4))
-		{
-			int sensorNum = (instruction[15] == '1' && instruction[16] == '0') ? 10 : atoi(instruction[15]);
-			Wire.write(sensor.sensorType(sensorNum)); 
-		}
+		c = Wire.read();
+		instruction += char(c);
 	}
 	
 }
-void receiveEvent(int num)
+
+void getReading()
 {
-	int i = 0;
-	while(Wire.available())
-	{
-		instruction[i] = Wire.read();
-		i++;
-	}
-	instruction[i] = '\0';
-	
+   long duration;
+
+   digitalWrite(trigPin, LOW); 
+   delayMicroseconds(5);
+   
+   digitalWrite(trigPin, HIGH);
+   delayMicroseconds(10); 
+   		 
+   digitalWrite(trigPin, LOW);
+   duration = pulseIn(echoPin, HIGH);
+   reading = ((duration/2)/29 > 255) ? 255 : (duration/2)/29;
+   Serial.println((int)reading);
+
 }

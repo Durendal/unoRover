@@ -3,69 +3,35 @@
 
 //Coordinator coord(0);
 int i2c;
-int sensorResult;
-int encoderPin = 12;
 String instruction;
-long counter = 0;
-int nextmove = 0;
-long encoderRead = 0;
-long roundCount = 0;
+char command;
+char instruc_arr[MAX_MSG];
+int sensorVal = 0;
+int echoPin = 8;
+int trigPin = 9;
+
 void setup()
 {
    Serial.begin(9600);
-
-   pinMode(encoderPin, INPUT);
    instruction = "";
    Wire.begin();
+   pinMode(echoPin, INPUT);
+   pinMode(trigPin, OUTPUT);
+   getReading();
 }
 
 void loop()
 {
-    
-    char* moves[] = {
-                      "COMMAND: WRIT MOVE FWD",
-                      "COMMAND: WRIT MOVE BAC",
-                      "COMMAND: WRIT TURN LFT",
-                      "COMMAND: WRIT TURN RGT"
-                    };    
-    if(receiveInstruction())
+    if(receiveinstruction())
     {
-        i2c = parseInstruction();
-        encoderRead = (instruction[0] == 'h') ? 0 : encoderRead;
-        if(i2c == SENSOR)
-        {
-             //sensorResult = coord.Reading();
-             //Wire.write(
-             //coord.sendData("DATA: " + (String) coord.senID + ":" + (String) coord.senNum + " " + (String) sensorResult);
-             1+1;
-        }
-        else if(i2c == ROVER)
-        {
-             int i = 0;
-             Wire.beginTransmission(i2c);
-             for(i = 0; i < instruction.length(); i++)
-               Wire.write(instruction[i]);
-             Wire.endTransmission();
-
-             //coord.sendInstruction(ROVER);
-        }
-        
+        parseinstruction();
+               
     }
-    
-    if(instruction[0] == 'a' || instruction[0] == 'd')
-    {
-        encoderRead += readEncoder(); 
-        if(roundCount % 4299 == 0)
-        {
-             Serial.print("Encoder Ticks: ");
-             Serial.println(encoderRead);
-        }
-    }
-    roundCount++;
+    delay(100);
 }
-bool receiveInstruction()
+bool receiveinstruction()
 {
-        char c;
+        int c;
         instruction = "";
 	//Check if theres any data on the serial line
 	if(Serial.available())
@@ -73,34 +39,84 @@ bool receiveInstruction()
 		while(Serial.available())
 		{
 			c = Serial.read();
-			instruction += c;
+			instruction += char(c);
+                        delay(5);
 		}
+                //Serial.println("Received instruction: " + instruction);
 		return true;
 	}
 
 	return false;
 }
 
-int parseInstruction()
+void parseinstruction()
 {
-        return ROVER;
-	
+        int i;
+        int c;
+        int data;
+        instruction.toCharArray(instruc_arr, instruction.length());
 	// If temp contains READ this is a sensor instruction
-	if(instruction.indexOf("READ") != -1)
+	if(instruction.indexOf("READ") != -1 || instruction.indexOf("NUMS") != -1 || instruction.indexOf("TYPE") != -1)
 	{
-		return SENSOR;
+             //getReading();
+
+             Wire.beginTransmission(SENSOR);
+             for(i = 0; i < instruction.length(); i++)
+               Wire.write(instruc_arr[i]);
+             Wire.endTransmission();
+             Wire.requestFrom(SENSOR, 1);
+             
+             if(Wire.available())
+             {
+                sensorVal = Wire.read() << 8 | Wire.read();
+             }
+             Serial.print(sensorVal);
 	}
 	// If temp contains WRIT this is a rover instruction
-	if(instruction.indexOf("WRIT") != -1)
+	else if(instruction.indexOf("WRIT") != -1)
 	{
-		return ROVER;
+                if(instruction.indexOf("FWD") != -1)
+                   command = 'w';
+                else if(instruction.indexOf("BAC") != -1)
+                   command = 's';
+                else if(instruction.indexOf("LFT") != -1)
+                   command = 'a';
+                else if(instruction.indexOf("RGT") != -1)
+                   command = 'd';
+                else if(instruction.indexOf("SPD") != -1)
+                {
+                  char rSpeed[4];
+                  String roverSpeed = "p";
+                  roverSpeed += instruction.substring(instruction.indexOf("SPD")+4);   
+                  roverSpeed.toCharArray(rSpeed, 3);
+                  Wire.beginTransmission(ROVER);
+                  for(i = 0; i < 4; i++)
+                    Wire.write(rSpeed[i]);
+                  Wire.endTransmission();
+                }
+                else
+                   command = 'h'; 
+               Wire.beginTransmission(ROVER);
+                 Wire.write(command);
+               Wire.endTransmission();
+		
 	}
-	else
-	{
-		return 0;
-	}
+
 }
-int readEncoder()
+
+void getReading()
 {
-   return digitalRead(encoderPin); 
+   long duration;
+
+   digitalWrite(trigPin, LOW); 
+   delayMicroseconds(5);
+   
+   digitalWrite(trigPin, HIGH);
+   delayMicroseconds(10); 
+   		 
+   digitalWrite(trigPin, LOW);
+   duration = pulseIn(echoPin, HIGH);
+   sensorVal = ((duration/2)/29 > 255) ? 255 : (duration/2)/29;
+   Serial.print(sensorVal);
+
 }
