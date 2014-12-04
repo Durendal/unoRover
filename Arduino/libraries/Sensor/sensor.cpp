@@ -29,13 +29,13 @@ void Sensor::addSensor(int type, int pin[])
 {
 	sensors[sensorCount] = type;
 
-	if(type == 0)
+	if(type == ENCODER)
 	{
 		pins[sensorCount*2] = pin[0];
 		pinMode(pins[sensorCount*2], INPUT);
 
 	}
-	else if(type == 1)
+	else if(type == ULTRASONIC)
 	{
 		pins[sensorCount*2] = pin[0];
 		pins[sensorCount*2+1] = pin[1];
@@ -50,24 +50,24 @@ void Sensor::addSensor(int type, int pin[])
 */
 int Sensor::readSensor(int sensorNum, int type)
 {
-	if(type == 0)
+	if(type == ENCODER)
 	{
 			return digitalRead(pins[sensorNum*2]);
 	}
-	else if(type == 1)
+	else if(type == ULTRASONIC)
 	{
 		int sensorNum = (int) sensorNum;
-		digitalWrite(pins[sensorNum*2], LOW); 
+		digitalWrite(pins[sensorNum*2+1], LOW); 
 		delayMicroseconds(2); 
 
-		digitalWrite(pins[sensorNum*2], HIGH);
+		digitalWrite(pins[sensorNum*2+1], HIGH);
 		delayMicroseconds(10); 
 		 
-		digitalWrite(pins[sensorNum*2], LOW);
-		long duration = pulseIn(pins[sensorNum*2+1], HIGH);
+		digitalWrite(pins[sensorNum*2+1], LOW);
+		long duration = pulseIn(pins[sensorNum*2], HIGH);
 		 
 		//Calculate the distance (in cm) based on the speed of sound.
-		return (int) duration/58.2;
+		return (duration/2)29;
 	}
 
 }

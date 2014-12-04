@@ -11,10 +11,10 @@ class Sensor
 {
 	public:
 		Sensor();
-		void addSensor(int type, int pin[]);
-		int readSensor(int sensorNum, int type);
+		void addSensor(int, int []);
+		int readSensor(int, int);
 		int numSensors();
-		int sensorType(int sensorNum);
+		int sensorType(int);
 	private:
 		int sensors[10];
 		int sensorCount;
