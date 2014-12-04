@@ -4,78 +4,67 @@
 #include <Wire.h>
 
 Rover rover1(200);
-String instruction;
-char command;
+int instruction[MAX_MSG];
+int newSpeed;
+
 void setup() 
 {
-        Serial.begin(9600);
 	Wire.begin(ROVER);
-        Wire.onReceive(receiveEvent);
-        rover1.stopRover();
-        command = 'h';
-        instruction = "";
+    Wire.onReceive(receiveEvent);
+    Wire.onRequest(requestEvent);
+    rover1.stopRover();
+    command = STP;
 }
 
 void loop() 
 {
     drive();
-    delay(100);
+    delay(10);
     
 }  
 
 void drive()
 {
 
-	switch(command)
+	switch(instruction[0])
 	{
-		case 'w':
-                case 'W':
-                
+		case FWD:
 			rover1.moveForward();
 			break;
-                case 'A':
-		case 'a':
+		case LFT:
 			rover1.turn(0);
 			break;
-                case 'S':
-		case 's':
+		case BAC:
 			rover1.moveBackward();
 			break;
-                case 'D':
-		case 'd':
+		case RGT:
 			rover1.turn(1);
 			break;
-                case 'H':
-		case 'h':
+        case SPD:
+            rover1.roverSpeed(instruction[1]);
+            break;
+		case STP:
 		default:
 			rover1.stopRover();
 			break; 				
         }        
-        delay(3000);
 }
 
 void receiveEvent(int num)
 {
-    char c;
-    while(Wire.available())
+    if(Wire.available())
     {
-        c = Wire.read();
-        instruction += c;
+        int i = 0;
+        do
+        {
+            instruction[i] = Wire.read();
+            i++;
+        }while(instruction[i] != ENDMSG && i < MAX_MSG);
+
     }
-    parseInstruction();
 }
 
-void parseInstruction()
+void requestEvent()
 {
-   if(instruction.indexOf("FWD") != -1)
-      command = 'w';
-   else if(instruction.indexOf("BAC") != -1)
-      command = 's';
-   else if(instruction.indexOf("LFT") != -1)
-      command = 'a';
-   else if(instruction.indexOf("RGT") != -1)
-      command = 'd';
-   else
-      command = 'h'; 
+    Wire.write(rover1.getSpeed());
 }
-
