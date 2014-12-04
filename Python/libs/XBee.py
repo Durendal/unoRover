@@ -44,31 +44,29 @@ class XBee:
 		return msg
 		
 	def sendCmd(self, cmd):
-		if cmd == "FWD":
+		cmd = cmd.split(" ")
+		if cmd[0] == "FWD":
 			self.serial.write(self.commands['FWD'])
-		elif cmd == "BAC":
+		elif cmd[0] == "BAC":
 			self.serial.write(self.commands['BAC'])
-		elif cmd == "LFT":
+		elif cmd[0] == "LFT":
 			self.serial.write(self.commands['LFT'])
-		elif cmd == "RGT":
+		elif cmd[0] == "RGT":
 			self.serial.write(self.commands['RGT'])
-		elif cmd == "STP":
+		elif cmd[0] == "STP":
 			self.serial.write(self.commands['STP'])
-		elif cmd == "NUMS":
+		elif cmd[0] == "NUMS":
 			self.serial.write(self.commands['NUMS'])
-		elif "READ" in cmd:
-			cmd = cmd.split(" ")
+		elif "READ" == cmd[0]:
 			self.serial.write(self.commands['READ'])
 			self.serial.write(cmd[1])
 			self.serial.write(cmd[2])
-		elif "TYPS" in cmd:
-			cmd = cmd.split(" ")
+		elif "TYPS" == cmd[0]:
 			self.serial.write(self.commands['TYPS'])
 			self.serial.write(cmd[1])
-		elif "GSP" in cmd:
+		elif "GSP" == cmd[0]:
 			self.serial.write(self.commands['GSP'])
-		elif "SPD" in cmd:
-			cmd = cmd.split(" ")
+		elif "SPD" == cmd[0]:
 			self.serial.write(self.commands['SPD'])
 			self.serial.write(cmd[1])
 		self.serial.write(self.commands['ENDMSG'])
