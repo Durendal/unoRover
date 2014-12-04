@@ -23,11 +23,9 @@ class manual:
 		self.description = "Manually controlled diagnostic algorithm"
 		self.fw = framework
 		self.variables = {}
-		self.variables['verbose'] = {'required' : False, 'description' : 'prints out every ten millionth instruction as sent back from the rover', 'default' : 'False'}
+		self.variables['verbose'] = {'required' : False, 'description' : 'prints out the keys the user has entered', 'default' : 'False'}
 		self.variables['serial'] = {'required' : True, 'description' : 'address of serial port'}
-		
-		
-		
+		self.speed = 200
 
 	def execute(self):
 		if self.verbose.lower() == "true":
@@ -60,22 +58,22 @@ class manual:
 				break
 			pew = self.fw.libs.Getch.getdatch()
 			try:
-				command = "COMMAND: WRIT "
 				if pew.lower() == 'w':
-					command += "MOVE FWD"
+					command = "FWD"
 				elif pew.lower() == 's':
-					command += "MOVE BAC"
+					command = "BAC"
 				elif pew.lower() == 'a':
-					command += "TURN LFT"
+					command = "LFT"
 				elif pew.lower() == 'd':
-					command += "TURN RGT"
-				elif pew.lower() == 'p':
-					spd = ""
-					for i in range(0, 4):
-						spd += self.fw.libs.Getch.getdatch()
-					command += "MOVE SPD " + spd
+					command = "RGT"
+				elif pew.lower() == 'f':
+					self.speed += 5
+					command = "SPD " + str(self.speed)
+				elif pew.lower() == 'v':
+					self.speed -= 5
+					command = "SPD " + str(self.speed)
 				else:
-					command += "MOVE STP"
+					command = "STP"
 
 				con.write(command)
 			except:
