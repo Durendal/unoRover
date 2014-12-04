@@ -3,84 +3,11 @@
 
 Coordinator::Coordinator(int id)
 {
-	char instruction[MAX_MSG];
-	char lastInstruction[MAX_MSG];
-	Wire.begin();
-	Serial.begin(9600);
+	int instruction[MAX_MSG];
+	instruction[0] = ENDMSG;
+	int lastInstruction[MAX_MSG];
+	lastInstruction[0] = ENDMSG;
 	int roverID = id;
-	int senID;
-	int senNum;
-}
-
-int Coordinator::Reading()
-{
-
-	//Create a buffer for the result, and construct a query for the SENSOR device
-	char reading[MAX_MSG]; 
-	sendInstruction(SENSOR);
-
-	//Ping the SENSOR device for its results
-	Wire.requestFrom(SENSOR, MAX_MSG);
-	
-	//Read in results from SENSOR device
-	int i = 0;
-	while(Wire.available())
-	{
-		reading[i] = Wire.read();
-		i++;
-	}
-	reading[i] = '\0';
-
-	
-	return atoi(reading);
-}
-
-void Coordinator::sendInstruction(int deviceID)
-{
-	Wire.beginTransmission(deviceID);
-	Wire.write(strdup(instruction));
-	Wire.endTransmission();
-}
-
-int Coordinator::receiveInstruction()
-{
-	int i = 0;
-
-	//Check if theres any data on the serial line
-	if(Serial.available())
-	{
-
-		//Copy the current instruction into lastInstruction, then zero out instruction
-		strncpy(lastInstruction, instruction, sizeof(instruction));
-		clearInstruction();
-
-		//Read the data into instruction
-		while(Serial.available())
-		{
-			instruction[i] = Serial.read();
-			i++;
-		}
-		instruction[i] = '\0';
-
-		return true;
-	}
-
-	return false;
-}
-
-void Coordinator::sendData(String data)
-{
-	Serial.print(data);
-}
-
-void Coordinator::setInstruction(char* instr, int len)
-{
-	strncpy(instruction, instr, len);
-}
-
-char* Coordinator::getInstruction()
-{
-	return strdup(instruction);
 }
 
 void Coordinator::setRoverID(int id)
@@ -88,42 +15,55 @@ void Coordinator::setRoverID(int id)
 	roverID = id;
 }
 
+void Coordinator::setInstruction(int instruc[], int instrucLen)
+{
+	setLastInstruction();
+	int i;
+	for(i = 0; i < instrucLen && i < MAX_MSG; i++)
+		instruction[i] = instruc[i];
+}
+void Coordinator::getInstruction(int* instruc)
+{
+	int i = 0;
+	do
+	{
+		instruc[i] = instruction[i];
+		i++;
+	}while(instruc[i] != ENDMSG && i < MAX_MSG)
+}
+void Coordinator::setLastInstruction()
+{
+	int i = 0;
+	do
+	{
+		lastInstruction[i] = instruction[i];
+		i++;
+	}while(instruction[i] != ENDMSG && i < MAX_MSG);
+}
 int Coordinator::getRoverID()
 {
 	return roverID;
 }
 
-void Coordinator::clearInstruction()
-{
-	//Zero out instruction
-	int i;
-	for(i = 0; i < MAX_MSG; i++)
-		instruction[i] = 0;
-}
-
 int Coordinator::parseInstruction()
 {
 	// Read in the first 4 characters after Command: 
-	
-	char temp[4];
-	int i;
-	for(i = 9; i < 13; i++)
-		temp[i-9] = instruction[i];
-	
-	temp[i] = '\0';
-	
-	// If temp contains READ this is a sensor instruction
-	if(strcmp(temp, "READ") == 0)
+	int instType;
+	switch(instruction[0])
 	{
-		return SENSOR;
+		case FWD:
+		case BAC:
+		case STP:
+		case LFT:
+		case RGT:
+			instType = ROVER;
+			break;
+		case READ:
+		case NUMS:
+		case TYPS:
+			instType = SENSOR;
+			break;
 	}
-	// If temp contains WRIT this is a rover instruction
-	else if(strcmp(temp, "WRIT") == 0)
-	{
-		return ROVER;
-	}
-	else
-	{
-		return 0;
-	}
+	return instType;
+
 }

@@ -2,7 +2,6 @@
 #define COORDINATOR_H
 
 #include <Arduino.h>
-#include <Wire.h>
 
 /*
 	Constants:
@@ -14,7 +13,7 @@
 		ULTRASONIC - Sensor ID for ultrasonic sensors
 		CAMERA - Sensor ID for cameras
 */
-#define MAX_MSG 1024
+#define MAX_MSG 64
 #define COORDINATOR 0
 #define ROVER 1
 #define SENSOR 2
@@ -22,26 +21,36 @@
 #define ULTRASONIC 1
 #define CAMERA 2
 
+/*
+	Commands:
+		These are the commands for the rover
+*/		
+#define ENDMSG 0x00
+#define FWD 0x01
+#define BAC 0x02
+#define STP 0x03
+#define LFT 0x04
+#define RGT 0x05
+#define GSP 0x06
+#define SPD 0x07
+#define READ 0x08
+#define TYPS 0x09
+#define NUMS 0x0A
+
+
 class Coordinator
 {
 	public:
 
-		Coordinator(int id);
-		int Reading();
-		void sendInstruction(int deviceID);
-		int receiveInstruction();
-		void sendData(String data);
-		void setInstruction(char* instr, int len = MAX_MSG);
-		char* getInstruction();
-		void setRoverID(int id);
+		Coordinator(int);
+		void setRoverID(int);
 		int getRoverID();
+		void setInstruction(int[], int);
+		void getInstruction(int*);
+		void setLastInstruction();
 		int parseInstruction();
-		int senID;
-		int senNum;
-	private:
-		void clearInstruction();
-		char instruction[MAX_MSG];
-		char lastInstruction[MAX_MSG];
+		int instruction[MAX_MSG];
+		int lastInstruction[MAX_MSG];
 		int roverID;
 
 
